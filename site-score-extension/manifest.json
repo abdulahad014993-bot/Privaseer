@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Privaseer",
+  "version": "0.5.0",
+  "description": "Gives a simple privacy/security score, warns on risky sites, and runs once per root domain.",
+  "action": { "default_title": "Site Score", "default_popup": "popup.html" },
+  "icons": { "128": "icon128.png" },
+  "permissions": ["tabs", "storage", "webRequest"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    { "matches": ["<all_urls>"], "js": ["content.js"], "css": ["content.css"], "run_at": "document_idle" }
+  ],
+  "options_page": "options.html",
+  "web_accessible_resources": [
+    { "resources": ["content.css"], "matches": ["<all_urls>"] }
+  ]
+}

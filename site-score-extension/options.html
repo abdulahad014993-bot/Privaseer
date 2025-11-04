@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Site Score Options</title>
+  <style>
+    body{margin:0;background:#0c0c0d;color:#e5e7eb;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    .wrap{max-width:720px;margin:36px auto;padding:0 20px}
+    .row{display:flex;align-items:center;justify-content:space-between;border:1px solid #2a2a2d;border-radius:12px;padding:14px 16px;background:#0f0f10;margin-bottom:12px}
+    label{font-weight:600} .muted{color:#9ca3af;font-size:12px}
+    input[type="checkbox"]{transform:scale(1.2)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Options</h1>
+
+    <div class="row">
+      <div><label>Show a small toast on page load</label><div class="muted">Non-intrusive corner message.</div></div>
+      <input type="checkbox" id="autoToast">
+    </div>
+
+    <div class="row">
+      <div><label>Warn me on very low scores</label><div class="muted">Dismissible alert if the site looks risky.</div></div>
+      <input type="checkbox" id="warnEnabled">
+    </div>
+
+    <div class="row">
+      <div><label>Warning threshold</label><div class="muted">Current: <span id="thDisplay"></span></div></div>
+      <input type="range" id="warnThreshold" min="5" max="50" step="1">
+    </div>
+  </div>
+
+  <script>
+    const DEFAULT={autoToast:true,warnEnabled:true,warnThreshold:25};
+    const els={};
+    async function load(){
+      const s=await chrome.storage.local.get(Object.keys(DEFAULT));
+      const cfg={...DEFAULT,...s};
+      els.autoToast.checked=cfg.autoToast;
+      els.warnEnabled.checked=cfg.warnEnabled;
+      els.warnThreshold.value=cfg.warnThreshold;
+      els.thDisplay.textContent=cfg.warnThreshold;
+    }
+    function save(){
+      const cfg={ autoToast:els.autoToast.checked, warnEnabled:els.warnEnabled.checked, warnThreshold:Number(els.warnThreshold.value) };
+      chrome.storage.local.set(cfg);
+      els.thDisplay.textContent=cfg.warnThreshold;
+    }
+    document.addEventListener("DOMContentLoaded", ()=>{
+      els.autoToast=document.getElementById("autoToast");
+      els.warnEnabled=document.getElementById("warnEnabled");
+      els.warnThreshold=document.getElementById("warnThreshold");
+      els.thDisplay=document.getElementById("thDisplay");
+      load();
+      els.autoToast.addEventListener("change",save);
+      els.warnEnabled.addEventListener("change",save);
+      els.warnThreshold.addEventListener("input",save);
+    });
+  </script>
+</body>
+</html>

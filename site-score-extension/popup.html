@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Site Score</title>
+  <link rel="stylesheet" href="popup.css"/>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">SITE PRIVACY SCORE</div>
+    <div class="circle">
+      <svg viewBox="0 0 120 120" class="dial">
+        <circle cx="60" cy="60" r="52" class="bg"></circle>
+        <circle cx="60" cy="60" r="52" class="fg" id="fg"></circle>
+      </svg>
+      <div class="num" id="num">--</div>
+    </div>
+
+    <ul class="facts" id="facts"></ul>
+
+    <div class="actions">
+      <button class="btn" id="knowMore">Know more</button>
+      <a class="link" href="options.html" target="_blank">Options</a>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

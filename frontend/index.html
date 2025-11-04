@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Data Privacy Visualizer</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
+    .wrap { max-width: 980px; margin: 0 auto; }
+    textarea, input { width: 100%; padding: 10px; margin: 6px 0 12px; }
+    button { padding: 10px 16px; cursor: pointer; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .card { border: 1px solid #eee; border-radius: 12px; padding: 16px; }
+    .evidence { margin-top: 12px; }
+    .evidence li { margin-bottom: 8px; }
+    .muted { color:#666; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Data Privacy Visualizer</h1>
+    <p class="muted">Paste text or enter a privacy policy URL. You’ll see scores and the exact sentences detected.</p>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Analyze URL</h3>
+        <input id="url" placeholder="https://example.com/privacy" />
+        <button onclick="analyzeURL()">Analyze URL</button>
+        <p id="urlMeta" class="muted"></p>
+      </div>
+      <div class="card">
+        <h3>Analyze Pasted Text</h3>
+        <textarea id="text" rows="8" placeholder="Paste privacy policy text here..."></textarea>
+        <button onclick="analyzeText()">Analyze Text</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:24px;">
+      <h3>Scores</h3>
+      <div id="chart"></div>
+    </div>
+
+    <div class="card" style="margin-top:24px;">
+      <h3>Evidence (Top Hits per Category)</h3>
+      <div id="evidence"></div>
+    </div>
+  </div>
+
+  <script>
+    const API = "http://127.0.0.1:8000";
+
+    function toSeries(results) {
+      const cats = Object.keys(results);
+      const scores = cats.map(c => results[c].score);
+      const counts = cats.map(c => results[c].count);
+      return { cats, scores, counts };
+    }
+
+    function renderChart(results) {
+      const { cats, scores } = toSeries(results);
+      const trace = { type: "bar", x: cats.map(c => c.replace(/_/g, " ")), y: scores };
+      const layout = { yaxis: { title: "Normalized Score (0–1)", range: [0,1] }, margin: { l: 40, r: 20, t: 10, b: 80 } };
+      Plotly.newPlot("chart", [trace], layout, {displayModeBar: false});
+    }
+
+    function renderEvidence(results) {
+      const container = document.getElementById("evidence");
+      container.innerHTML = "";
+      for (const [cat, data] of Object.entries(results)) {
+        const title = document.createElement("h4");
+        title.textContent = cat.replace(/_/g, " ") + ` (${data.count})`;
+        const list = document.createElement("ul");
+        list.className = "evidence";
+        if (data.evidence.length === 0) {
+          const li = document.createElement("li"); li.className = "muted"; li.textContent = "No sentences found."; list.appendChild(li);
+        } else {
+          data.evidence.forEach(s => {
+            const li = document.createElement("li");
+            li.textContent = s.text;
+            list.appendChild(li);
+          });
+        }
+        container.appendChild(title);
+        container.appendChild(list);
+      }
+    }
+
+    async function analyzeText() {
+      const text = document.getElementById("text").value.trim();
+      if (!text) return alert("Paste some text first.");
+      const res = await fetch(`${API}/analyze/text`, {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ text })
+      });
+      const data = await res.json();
+      if (data.error) return alert(data.error);
+      renderChart(data.results); renderEvidence(data.results);
+      document.getElementById("urlMeta").textContent = "";
+    }
+
+    async function analyzeURL() {
+      const url = document.getElementById("url").value.trim();
+      if (!url) return alert("Enter a URL first.");
+      const res = await fetch(`${API}/analyze/url`, {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ url })
+      });
+      const data = await res.json();
+      if (data.error) return alert(data.error);
+      renderChart(data.results); renderEvidence(data.results);
+      const meta = data.meta ? `(~${data.meta.char_len} chars parsed)` : "";
+      document.getElementById("urlMeta").textContent = meta;
+    }
+  </script>
+</body>
+</html>

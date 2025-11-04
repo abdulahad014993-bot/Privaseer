@@ -1,0 +1,21 @@
+#siteScoreToast{
+  position:fixed; right:14px; bottom:14px; z-index:2147483647;
+  background:rgba(20,20,20,.94); color:#fff; padding:10px 12px; border-radius:10px;
+  font:12px/1.3 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  box-shadow:0 6px 16px rgba(0,0,0,.25); display:flex; align-items:center; gap:10px;
+  opacity:0; transform:translateY(8px); transition:opacity .25s, transform .25s;
+}
+#siteScoreToast.show{opacity:1; transform:translateY(0)}
+#siteScoreToast .dot{width:10px;height:10px;border-radius:50%}
+#siteScoreToast button{background:transparent;border:none;color:#aaa;cursor:pointer;margin-left:6px}
+#siteScoreToast button:hover{color:#fff}
+
+#siteScoreWarn{position:fixed; inset:0; z-index:2147483647; display:grid; place-items:center; background:rgba(0,0,0,.45)}
+#siteScoreWarn .card{width:min(520px,90vw); background:#0c0c0d; color:#e5e7eb; border:1px solid #2a2a2d; border-radius:14px; padding:18px; box-shadow:0 12px 30px rgba(0,0,0,.35)}
+#siteScoreWarn h3{margin:0 0 6px}
+#siteScoreWarn .muted{color:#a3a3a3; font-size:12px; margin-bottom:10px}
+#siteScoreWarn .row{display:flex; align-items:center; gap:12px; margin:8px 0}
+#siteScoreWarn .score{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;background:#c53030}
+#siteScoreWarn .btns{display:flex; gap:8px; justify-content:flex-end; margin-top:12px}
+#siteScoreWarn button{padding:8px 12px;border-radius:10px;border:1px solid #2a2a2d;background:#111;color:#e5e7eb;cursor:pointer}
+#siteScoreWarn button:hover{background:#141416}
